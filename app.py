@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import os
 import re
-from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode
+#from st_st.dataframe import GridOptionsBuilder, st.dataframe, GridUpdateMode, DataReturnMode
 from script_generation import *
 from pathlib import Path
 #https://towardsdatascience.com/make-dataframes-interactive-in-streamlit-c3d0c4f84ccb
@@ -81,7 +81,7 @@ def main():
             st.session_state.file.close()
             st.session_state.file = open(st.session_state.save_path,"a")
             col2.code(code)
-            AgGrid(st.session_state.raw_data)
+            st.dataframe(st.session_state.raw_data)
 
     elif page == "🧽 Data Cleaning - Manual Edits":
         col1.subheader("Awesome MVP")
@@ -112,7 +112,7 @@ def main():
         st.session_state.file = open(st.session_state.save_path,"a")
         col2.code(code)
 
-        AgGrid(st.session_state.raw_data)
+        st.dataframe(st.session_state.raw_data)
 
 
     elif page == "🧽 Data Cleaning - Conditional Selection":
@@ -180,7 +180,7 @@ def main():
         st.session_state.file = open(st.session_state.save_path,"a")
         col2.code(code)
 
-        AgGrid(st.session_state.raw_data)
+        st.dataframe(st.session_state.raw_data)
 
     elif page == "🧮 Calculation":
 
@@ -222,7 +222,7 @@ def main():
         st.session_state.file = open(st.session_state.save_path,"a")
         col2.code(code)
 
-        AgGrid(st.session_state.raw_data)
+        st.dataframe(st.session_state.raw_data)
 
 
 
@@ -257,7 +257,7 @@ def main():
             st.session_state.file = open(os.path.join(os.getcwd(),st.session_state.filename),"a")
             col2.code(code)
 
-        AgGrid(st.session_state.raw_data)
+        st.dataframe(st.session_state.raw_data)
 
 
 # Run main()
