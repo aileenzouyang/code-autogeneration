@@ -1,0 +1,10 @@
+# 1. import packages:
+import pandas as pd 
+import numpy as np 
+print('packages imported')
+
+# 2. Import data:
+raw_data = pd.read_csv(os.path.join(os.getcwd(),'input','geoMap.csv')
+# 3. Data curation:
+# skipping the first row
+raw_data = pd.read_csv(os.path.join(os.getcwd(),'input','geoMap.csv', skiprows=1)
