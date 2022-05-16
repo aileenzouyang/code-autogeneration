@@ -194,7 +194,7 @@ def main():
         st.dataframe(st.session_state.raw_data)
 
     elif page == "🧽 Data Cleaning - Select Columns":
-        col1.subheader("Remove Columns")
+        col1.subheader("Select Columns to Keep")
         options = col1.multiselect(
         'Select the columns you would like to keep: ',
         st.session_state.raw_data.columns,
