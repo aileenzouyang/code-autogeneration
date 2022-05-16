@@ -10,15 +10,18 @@ from script_generation import *
 from pathlib import Path
 #https://towardsdatascience.com/make-dataframes-interactive-in-streamlit-c3d0c4f84ccb
 
+
 def main():
-    raw_data = pd.read_csv(os.path.join(os.getcwd(),'input','cars.csv'))
+    #raw_data = pd.read_csv(os.path.join(os.getcwd(),'input','cars.csv'))
+    output_header = "Output Code: "
     #%%
     # Initialize a session
     if "filename" not in st.session_state:
         st.session_state.filename = "test.py"
         st.session_state.save_path = os.path.join(os.getcwd(),st.session_state.filename)
         #st.session_state.raw_data = pd.read_csv(os.path.join(os.getcwd(),'input','cars.csv'))
-        st.session_state.raw_data = pd.read_csv(os.path.join(os.getcwd(),'cars.csv'))
+        #st.session_state.raw_data = pd.read_csv(os.path.join(os.getcwd(),'cars.csv'))
+        st.session_state.raw_data = pd.DataFrame()
         st.session_state.file = open(st.session_state.save_path,"w")
         st.session_state.file.write("#Welcome to the new era, where data analyts don't have to write a single line of code\n")
         st.session_state.file.write("#%%\n")
@@ -42,6 +45,7 @@ def main():
     page_names = ["🏠 Home", 
                 "🧽 Data Cleaning - Manual Edits",
                 "🧽 Data Cleaning - Conditional Selection",
+                "🧽 Data Cleaning - Select Columns",
                 "🧮 Calculation",
                 "🪄 Export"]
 
@@ -51,8 +55,9 @@ def main():
 
     if page == "🏠 Home":
 
-        col1.subheader("FlashData")
-        lorem_ipsum = "FlashData autogenerates python script based on user requirement. \
+        col1.subheader("FlashScript")
+        lorem_ipsum = "Welcome, I am a python code generation bot to help you write data analytics script faster \
+            I am still a working progress, so do let me know how I can improve to serve you better. \
             To begin, load a excel or csv file and hit the Display button: "
         col1.markdown(lorem_ipsum, unsafe_allow_html=True)
 
@@ -63,7 +68,7 @@ def main():
         #gridOptions = gb.build()
 
         uploaded_file = col1.file_uploader("Upload an Excel or csv file: ", type = ["csv","xlsx"], accept_multiple_files=False, key=None, help=None, on_change=None, args=None, kwargs=None, disabled=False)
-        confirm = col1.button("Display")
+        confirm = col1.button("Click to Display Table")
         if confirm: 
             if uploaded_file.name.endswith('.csv'):
                 st.session_state.raw_data = pd.read_csv(uploaded_file)
@@ -72,21 +77,18 @@ def main():
                 st.session_state.raw_data = pd.read_excel(uploaded_file)
                 st.session_state.file.write("raw_data = pd.read_excel(os.path.join(os.getcwd(), '{}'))\n".format(uploaded_file.name))
             
-            col2.subheader('Output')
+        col2.subheader(output_header)
 
-            st.session_state.file.close()
-            st.session_state.file = open(st.session_state.save_path,"r")
-            code =  st.session_state.file.read()
-            st.session_state.file.close()
-            st.session_state.file = open(st.session_state.save_path,"a")
-            col2.code(code)
-            st.dataframe(st.session_state.raw_data)
+        st.session_state.file.close()
+        st.session_state.file = open(st.session_state.save_path,"r")
+        code =  st.session_state.file.read()
+        st.session_state.file.close()
+        st.session_state.file = open(st.session_state.save_path,"a")
+        col2.code(code)
+        st.dataframe(st.session_state.raw_data)
 
     elif page == "🧽 Data Cleaning - Manual Edits":
-        col1.subheader("FlashData")
-        col1.subheader("Data Cleaning")
-
-
+        col1.subheader("Data Cleaning - Manual Edits")
         # Ask user if they want to create an if statement
         row_ind = col1.selectbox("Replace row: ",(st.session_state.raw_data.index))      
         col_ind = col1.selectbox("column ",(st.session_state.raw_data.columns))  
@@ -110,7 +112,7 @@ def main():
             st.session_state.raw_data.loc[row_ind,col_ind] = new_value
             confirm = False
         
-        col2.subheader('Output')
+        col2.subheader(output_header)
 
         st.session_state.file.close()
         st.session_state.file = open(st.session_state.save_path,"r")
@@ -124,7 +126,6 @@ def main():
 
     elif page == "🧽 Data Cleaning - Conditional Selection":
 
-        col1.subheader("FlashData")
         col1.subheader("Data Cleaning")
 
         # Ask user if they want to remove NaN
@@ -181,7 +182,7 @@ def main():
             col1.write("Success!")
             confirm = False
         
-        col2.subheader('Output')
+        col2.subheader(output_header)
 
         st.session_state.file.close()
         st.session_state.file = open(st.session_state.save_path,"r")
@@ -192,11 +193,35 @@ def main():
 
         st.dataframe(st.session_state.raw_data)
 
+    elif page == "🧽 Data Cleaning - Select Columns":
+        col1.subheader("Remove Columns")
+        options = col1.multiselect(
+        'Select the columns you would like to keep: ',
+        st.session_state.raw_data.columns,
+        st.session_state.raw_data.columns[0])
+        confirm = st.button("Select the columns above")
+        if confirm:
+            equation = "raw_data = raw_data[{}]".format(options)
+            string = "{}\n".format(equation)
+            execution_string = script_generation_from_equation(string)
+            try: exec(execution_string)
+            except: st.write("Not a valid function")
+            else: st.session_state.file.write(string)
+
+        col2.subheader(output_header)
+
+        st.session_state.file.close()
+        st.session_state.file = open(st.session_state.save_path,"r")
+        code =  st.session_state.file.read()
+        st.session_state.file.close()
+        st.session_state.file = open(st.session_state.save_path,"a")
+        col2.code(code)
+        st.dataframe(st.session_state.raw_data)
+
     elif page == "🧮 Calculation":
 
-        col1.subheader("FlashData")
-        col1.subheader("Calculation")
-        string = col1.text_input("Equation: ")
+        col1.subheader("Calculate New Columns")
+        string = col1.text_input("Equation (e.g., A=B*3): ")
         confirm = col1.button("Generate")
         if confirm: 
             print(string)
@@ -224,7 +249,7 @@ def main():
                 st.session_state.file.write("{} \n".format(final_equation))
                 col1.write("Success!")
 
-        col2.subheader('Output')
+        col2.subheader(output_header)
 
         st.session_state.file.close()
         st.session_state.file = open(st.session_state.save_path,"r")
@@ -239,18 +264,18 @@ def main():
     elif page == "🪄 Export":
         filename = "autogenerated-code.py"
 
-        confirm = col1.button("Export New Sheet")
+        confirm = col1.button("Add code to export final data")
         if confirm:
             st.session_state.file.write("# Export final data\n")
-            #st.session_state.file.write("raw_data = raw_data.to_csv(os.path.join(os.getcwd(),'output','cars_final.csv'))\n")
+            #st.session_state.file.write("raw_data = raw_data.to_csv(os.path.join(os.getcwd(),output_header,'cars_final.csv'))\n")
             st.session_state.file.write("raw_data = raw_data.to_csv(os.path.join(os.getcwd(),'final.csv'))\n")
             st.session_state.file.write("# The End")
         
         st.session_state.file.close()
         st.session_state.file = open(os.path.join(os.getcwd(),st.session_state.filename),"r")
-        st.download_button('Download .py', st.session_state.file, filename) 
+        col1.download_button('Download .py', st.session_state.file, filename) 
         
-        col2.subheader('Output')
+        col2.subheader(output_header)
         st.session_state.file.close()
         st.session_state.file = open(os.path.join(os.getcwd(),st.session_state.filename),"r")
         code =  st.session_state.file.read()
