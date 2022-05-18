@@ -4,7 +4,6 @@
 import numpy as np
 import pandas as pd
 import os
-raw_data = pd.read_csv(os.path.join(os.getcwd(), 'cars.csv'))
-# Dropping rows if it contains any NaN:
-raw_data = raw_data.dropna()
-raw_data = raw_data[['Car', 'Cylinders', 'Weight', 'Acceleration']]
+raw_data = pd.read_csv(os.path.join(os.getcwd(), 'Admission Data.csv'))
+for parameter in ['Name of University', 'GPA']:
+  raw_data[parameter].replace({'':''}, inplace = True)
